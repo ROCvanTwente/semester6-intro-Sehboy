@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Encrypt Message";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-primary">Encrypt Your Message Using Caesar Cipher</h2>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger">@ViewBag.Error</div>
+    }
+
+    <form method="post" action="/Encryption/EncryptMessage" class="mb-4">
+        <div class="mb-3">
+            <label for="message" class="form-label">Enter your message:</label>
+            <input type="text" class="form-control" id="message" name="message" placeholder="Type your message here..." />
+        </div>
+        <button class="btn btn-primary" type="submit">
+            <i class="bi bi-lock"></i> Encrypt
+        </button>
+    </form>
+
+
+    @if (ViewBag.OriginalMessage != null && ViewBag.EncryptedMessage != null)
+    {
+        <script>
+            window.onload = function () {
+                var myModal = new bootstrap.Modal(document.getElementById('resultModal'));
+                myModal.show();
+            };
+        </script>
+
+        <div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalTitle">Encryption Result</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Original Message:</strong> @ViewBag.OriginalMessage</p>
+                        <p><strong>Encrypted Message:</strong> <span class="text-success">@ViewBag.EncryptedMessage</span></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" onclick="CopyCeasarHash()">Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <script>
+        function CopyCeasarHash() {
+            var copyText = "@ViewBag.EncryptedMessage"; 
+            navigator.clipboard.writeText(copyText).then(() => {
+                alert("Encrypted message copied to clipboard!");
+            }).catch(err => {
+                console.error("Could not copy text: ", err);
+            });
+        }
+    </script>
+</div>
