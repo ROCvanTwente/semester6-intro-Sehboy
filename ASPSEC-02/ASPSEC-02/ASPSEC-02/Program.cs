@@ -10,15 +10,54 @@ class Program
 
     static void Main()
     {
-        Console.Write("Enter credit card number: ");
-        string creditCardNumber = Console.ReadLine();
+        using (var db = new AppDbContext())
+        {
+            Console.Write("First Name: ");
+            string firstName = Console.ReadLine();
 
-        string encryptedData = Encrypt(creditCardNumber);
-        Console.WriteLine($"Encrypted: {encryptedData}");
+            Console.Write("Last Name: ");
+            string lastName = Console.ReadLine();
 
-        string decryptedData = Decrypt(encryptedData);
-        Console.WriteLine($"Decrypted: {decryptedData}");
+            Console.Write("Street: ");
+            string street = Console.ReadLine();
+
+            Console.Write("Postal Address: ");
+            string postalAddress = Console.ReadLine();
+
+            Console.Write("City: ");
+            string city = Console.ReadLine();
+
+            Console.Write("House Number: ");
+            int houseNumber = int.Parse(Console.ReadLine());
+
+            Console.Write("Card Holder Name: ");
+            string cardHolderName = Console.ReadLine();
+
+            Console.Write("Enter Credit Card Number: ");
+            string creditCardNumber = Console.ReadLine();
+
+            string encryptedData = Encrypt(creditCardNumber);
+
+            var card = new CreditCard
+            {
+                FirstName = firstName,
+                LastName = lastName,
+                Street = street,
+                PostalAddress = postalAddress,
+                City = city,
+                HouseNumber = houseNumber,
+                CardHolderName = cardHolderName,
+                EncryptedCardNumber = encryptedData
+            };
+
+            db.CreditCards.Add(card);
+            db.SaveChanges();
+
+            Console.WriteLine("Credit card saved successfully!");
+        }
     }
+
+
 
     static string Encrypt(string plainText)
     {
