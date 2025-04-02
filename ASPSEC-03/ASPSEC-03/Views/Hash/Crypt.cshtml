@@ -1,0 +1,90 @@
+﻿@model HashingApp.Models.HashModel
+
+@{
+    ViewData["Title"] = "Hash Generator";
+}
+
+<h2 class="mb-4">Hash Generator</h2>
+
+<form id="hashForm" class="border p-4 rounded shadow-sm bg-light">
+    <div class="form-group mb-3">
+        <label asp-for="InputText" class="form-label">Voer tekst in</label>
+        <input asp-for="InputText" id="inputText" class="form-control" placeholder="Typ hier uw tekst..." required />
+        <span asp-validation-for="InputText" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Algorithm" class="form-label">Kies een algoritme</label>
+        <select asp-for="Algorithm" id="algorithm" class="form-select">
+            <option value="">-- Selecteer een algoritme --</option>
+            <option value="MD5">MD5</option>
+            <option value="SHA1">SHA1</option>
+            <option value="SHA256">SHA256</option>
+            <option value="SHA512">SHA512</option>
+            <option value="BCRYPT">BCRYPT</option>
+        </select>
+        <span asp-validation-for="Algorithm" class="text-danger"></span>
+    </div>
+
+    <div class="alert alert-warning">
+        Let op: MD5 en SHA1 worden als onveilig beschouwd voor cryptografische doeleinden.
+    </div>
+
+    <button type="submit" class="btn btn-primary">Hash genereren</button>
+</form>
+
+<!-- Modal -->
+<div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resultModalLabel">Gehasht Resultaat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Sluiten"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Input:</strong> <span id="resultInput"></span></p>
+                <p><strong>Algoritme:</strong> <span id="resultAlgorithm"></span></p>
+                <p><strong>Hash:</strong> <code id="resultHash"></code></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sluiten</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById("hashForm").addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        let inputText = document.getElementById("inputText").value;
+        let algorithm = document.getElementById("algorithm").value;
+
+        if (!inputText || !algorithm) {
+            alert("Vul alle velden in!");
+            return;
+        }
+
+        fetch("/Hash/Crypt", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ InputText: inputText, Algorithm: algorithm })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById("resultInput").innerText = data.input;
+                document.getElementById("resultAlgorithm").innerText = data.algorithm;
+                document.getElementById("resultHash").innerText = data.hash;
+
+                let modal = new bootstrap.Modal(document.getElementById("resultModal"));
+                modal.show();
+            } else {
+                alert("Fout: " + data.message);
+            }
+        })
+        .catch(error => console.error("Error:", error));
+    });
+</script>
